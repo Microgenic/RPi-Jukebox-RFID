@@ -10,6 +10,114 @@ def GetMPC(command):
     from subprocess import check_output
     process = check_output(command.split())
     return process
+    
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915, 
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
+#mylcd.lcd_display_string(get_ip_address('eth0'), 2)    
+
+#fontdata1 = [
+        # char(0) - Upper-left character
+#        [ 0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b11111, 
+#          0b11111 ],
+
+        # char(1) - Upper-middle character
+#        [ 0b00000, 
+#          0b00000, 
+#          0b00100, 
+#          0b00110, 
+#          0b00111, 
+#          0b00111, 
+#          0b11111, 
+#          0b11111 ],
+        
+        # char(2) - Upper-right character
+#        [ 0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b10000, 
+#          0b11000 ],
+        
+        # char(3) - Lower-left character
+#        [ 0b11111, 
+#          0b11111, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000 ],
+       
+        # char(4) - Lower-middle character
+#        [ 0b11111, 
+#          0b11111, 
+#          0b00111, 
+#          0b00111, 
+#          0b00110, 
+#          0b00100, 
+#          0b00000, 
+#          0b00000 ],
+        
+        # char(5) - Lower-right character
+#        [ 0b11000, 
+#          0b10000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000, 
+#          0b00000 ],
+#]
+
+#mylcd.lcd_load_custom_chars(fontdata1)
+
+#mylcd.lcd_write(0x80)
+#mylcd.lcd_write_char(0)
+#mylcd.lcd_write_char(1)
+#mylcd.lcd_write_char(2)
+
+#mylcd.lcd_write(0xC0)
+#mylcd.lcd_write_char(3)
+#mylcd.lcd_write_char(4)
+#mylcd.lcd_write_char(5)
+
+
+
+fontdata1 = [
+        # char(0) - Play
+        [ 0b00000, 
+          0b10000, 
+          0b11000, 
+          0b11100, 
+          0b11110, 
+          0b11100, 
+          0b11000, 
+          0b10000 ],
+
+        # char(1) - Pause
+        [ 0b00000, 
+          0b11011, 
+          0b11011, 
+          0b11011, 
+          0b11011, 
+          0b11011, 
+          0b11011, 
+          0b11011 ]]
+
 
 def main():
   try:
@@ -47,9 +155,12 @@ def main():
 
             
         if playing == "[playing]": # If it is currently playing
+          mylcd.lcd_write(0xD5)
+          mylcd.lcd_write_char(0)
           mylcd.lcd_display_string("Playing",4)
         elif playing == "[paused]": # If is is paused
-            mylcd.lcd_display_string("Paused",4)      
+          mylcd.lcd_write(0xD5)
+          mylcd.lcd_write_char(31)     
         else:
             mylcd.lcd_display_string("",1)
             mylcd.lcd_display_string((" %s" %time.strftime("%H:%M"),2,7)

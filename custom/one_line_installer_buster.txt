@@ -1,0 +1,3 @@
+wget https://raw.githubusercontent.com/Microgenic/RPi-Jukebox-RFID/master/custom/buster-install-custom.sh
+
+wget https://raw.githubusercontent.com/Microgenic/RPi-Jukebox-RFID/custom/custom/buster-install-custom.sh
