@@ -1,8 +1,4 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Original code found at:
-# https://gist.github.com/DenisFromHR/cc863375a6e19dce359d
-
 """
 Compiled, mashed and generally mutilated 2014-2015 by Denis Pleic
 Made available under GNU GENERAL PUBLIC LICENSE
@@ -15,18 +11,13 @@ Made available under GNU GENERAL PUBLIC LICENSE
 # 2015-02-10, ver 0.1
 
 """
-
-# i2c bus (0 -- original Pi, 1 -- Rev 2 Pi)
-I2CBUS = 0
-
-# LCD Address
-ADDRESS = 0x27
-
+#
+#
 import smbus
-from time import sleep
+from time import *
 
 class i2c_device:
-   def __init__(self, addr, port=I2CBUS):
+   def __init__(self, addr, port=1):
       self.addr = addr
       self.bus = smbus.SMBus(port)
 
@@ -57,6 +48,10 @@ class i2c_device:
    def read_block_data(self, cmd):
       return self.bus.read_block_data(self.addr, cmd)
 
+
+
+# LCD Address
+ADDRESS = 0x27
 
 # commands
 LCD_CLEARDISPLAY = 0x01
@@ -143,55 +138,20 @@ class lcd:
       self.lcd_write_four_bits(mode | (charvalue & 0xF0))
       self.lcd_write_four_bits(mode | ((charvalue << 4) & 0xF0))
   
-   # put string function with optional char positioning
-   def lcd_display_string(self, string, line=1, pos=0):
-    if line == 1:
-      pos_new = pos
-    elif line == 2:
-      pos_new = 0x40 + pos
-    elif line == 3:
-      pos_new = 0x14 + pos
-    elif line == 4:
-      pos_new = 0x54 + pos
 
-    self.lcd_write(0x80 + pos_new)
+   # put string function
+   def lcd_display_string(self, string, line):
+      if line == 1:
+         self.lcd_write(0x80)
+      if line == 2:
+         self.lcd_write(0xC0)
+      if line == 3:
+         self.lcd_write(0x94)
+      if line == 4:
+         self.lcd_write(0xD4)
 
-    for char in string:
-      self.lcd_write(ord(char), Rs)
-
-   # put string function with optional char positioning
-   def lcd_display_scroll_string(self, string, line=1, pos=0):
-    if line == 1:
-      pos_new = pos
-    elif line == 2:
-      pos_new = 0x40 + pos
-    elif line == 3:
-      pos_new = 0x14 + pos
-    elif line == 4:
-      pos_new = 0x54 + pos
-
-    self.lcd_write(0x80 + pos_new)
-    global lastMSG
-    global lstMSGi
-    if lastMSG[li] == string:
-      if len(string) > LCD_WIDTH:    
-        for i in range(LCD_WIDTH):
-          i2 = i + lstMSGi[li]
-          lcd_byte(ord(string[i2]),LCD_CHR)
-          test = lstMSGi[li] + LCD_WIDTH
-          if test < len(string):
-            lstMSGi[li] += 1
-            sleep(E_DELAY)
-          else:
-            lstMSGi[li] = 0
-            sleep(5)
-      else:
-        string = string.ljust(LCD_WIDTH," ")
-        for char in string:
-          lcd_byte(ord(string[i]),LCD_CHR)
-    else:
-      lastMSG[li] = string
-      lstMSGi[li] = 0
+      for char in string:
+         self.lcd_write(ord(char), Rs)
 
    # clear lcd and set to home
    def lcd_clear(self):
@@ -212,3 +172,18 @@ class lcd:
          for line in char:
             self.lcd_write_char(line)         
          
+   # define precise positioning (addition from the forum)
+   def lcd_display_string_pos(self, string, line, pos):
+    if line == 1:
+      pos_new = pos
+    elif line == 2:
+      pos_new = 0x40 + pos
+    elif line == 3:
+      pos_new = 0x14 + pos
+    elif line == 4:
+      pos_new = 0x54 + pos
+
+    self.lcd_write(0x80 + pos_new)
+
+    for char in string:
+      self.lcd_write(ord(char), Rs)
