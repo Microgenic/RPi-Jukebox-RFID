@@ -14,10 +14,10 @@ Made available under GNU GENERAL PUBLIC LICENSE
 #
 #
 import smbus
-from time import *
+from time import sleep
 
 class i2c_device:
-   def __init__(self, addr, port=1):
+   def __init__(self, addr, port):
       self.addr = addr
       self.bus = smbus.SMBus(port)
 
@@ -47,11 +47,6 @@ class i2c_device:
 # Read a block of data
    def read_block_data(self, cmd):
       return self.bus.read_block_data(self.addr, cmd)
-
-
-
-# LCD Address
-ADDRESS = 0x27
 
 # commands
 LCD_CLEARDISPLAY = 0x01
@@ -101,8 +96,8 @@ Rs = 0b00000001 # Register select bit
 
 class lcd:
    #initializes objects and lcd
-   def __init__(self):
-      self.lcd_device = i2c_device(ADDRESS)
+   def __init__(self, Address, Bus):
+      self.lcd_device = i2c_device(Address, Bus)
 
       self.lcd_write(0x03)
       self.lcd_write(0x03)
@@ -114,7 +109,6 @@ class lcd:
       self.lcd_write(LCD_CLEARDISPLAY)
       self.lcd_write(LCD_ENTRYMODESET | LCD_ENTRYLEFT)
       sleep(0.2)
-
 
    # clocks EN to latch command
    def lcd_strobe(self, data):
@@ -174,16 +168,22 @@ class lcd:
          
    # define precise positioning (addition from the forum)
    def lcd_display_string_pos(self, string, line, pos):
-    if line == 1:
-      pos_new = pos
-    elif line == 2:
-      pos_new = 0x40 + pos
-    elif line == 3:
-      pos_new = 0x14 + pos
-    elif line == 4:
-      pos_new = 0x54 + pos
+        if line == 1:
+            pos_new = pos
+        elif line == 2:
+            pos_new = 0x40 + pos
+        elif line == 3:
+            pos_new = 0x14 + pos
+        elif line == 4:
+            pos_new = 0x54 + pos
 
-    self.lcd_write(0x80 + pos_new)
-
-    for char in string:
-      self.lcd_write(ord(char), Rs)
+        self.lcd_write(0x80 + pos_new)
+        
+        replace_spec_chars(string)
+        
+        for char in string:
+            self.lcd_write(ord(char), Rs)
+      
+   # Replace special chars
+   def replace_spec_chars(self, text)  
+        text = text.replace('ä','\341').replace('ö', '\357').replace('ü', '\365')

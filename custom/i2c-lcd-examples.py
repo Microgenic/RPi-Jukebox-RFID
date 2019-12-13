@@ -1,8 +1,14 @@
 # requires RPi_I2C_driver.py
-import RPi_I2C_driver
-from time import *
+import i2c-lcd-driver
+from time import sleep
 
-mylcd = RPi_I2C_driver.lcd()
+# LCD Address
+ADDRESS = 0x3f
+
+# i2c bus (0 -- original Pi, 1 -- Rev 2 Pi)
+I2CBUS = 1
+
+mylcd = i2c-lcd-driver.lcd(ADDRESS, I2CBUS)
 # test 2
 mylcd.lcd_display_string("RPi I2C test", 1)
 mylcd.lcd_display_string(" Custom chars", 2)
