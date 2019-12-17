@@ -179,11 +179,11 @@ class lcd:
 
         self.lcd_write(0x80 + pos_new)
         
-        replace_spec_chars(string)
+        self.replace_spec_chars(string)
         
         for char in string:
             self.lcd_write(ord(char), Rs)
       
    # Replace special chars
-   def replace_spec_chars(self, text)  
+   def replace_spec_chars(self, text):  
         text = text.replace('ä','\341').replace('ö', '\357').replace('ü', '\365')
