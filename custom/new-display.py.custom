@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: latin-1 -*-
 
-import i2c-lcd-driver
+import i2c_lcd_driver
 from time import sleep
 from subprocess import check_output
 
@@ -43,7 +43,7 @@ def get_ip_address(ifname):
     )[20:24])
 
 def main():
-    mylcd = i2c-lcd-driver.lcd(ADDRESS, I2CBUS)
+    mylcd = i2c_lcd_driver.lcd(ADDRESS, I2CBUS)
     while True:
         mpcstatus = GetMPC("mpc status")
         playing = mpcstatus.split("\n")[1].split(" ")[0] #Split to see if mpc is playing at the moment
@@ -79,9 +79,9 @@ def main():
             mylcd.lcd_display_string("",1)
             mylcd.lcd_display_string("",3)
             mylcd.lcd_display_string(" %s" %time.strftime("%H:%M %d.%m.%Y"),4,2)
-            mylcd.lcd_display_string(("READY - WIPE CARD!",2,1)
+            mylcd.lcd_display_string("READY - WIPE CARD!",2,1)
             sleep(0.5)
-            mylcd.lcd_display_string(("",2)
+            mylcd.lcd_display_string("",2)
             sleep(0.2)            
     
 if __name__ == '__main__':
