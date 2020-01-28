@@ -14,6 +14,7 @@ Made available under GNU GENERAL PUBLIC LICENSE
 #
 #
 import smbus
+import unicodedata
 from time import sleep
 
 class i2c_device:
@@ -144,6 +145,8 @@ class lcd:
       if line == 4:
          self.lcd_write(0xD4)
 
+      string=self.replace_spec_chars(string)
+
       for char in string:
          self.lcd_write(ord(char), Rs)
 
@@ -179,11 +182,23 @@ class lcd:
 
         self.lcd_write(0x80 + pos_new)
         
-        self.replace_spec_chars(string)
+        string=self.replace_spec_chars(string)
         
         for char in string:
             self.lcd_write(ord(char), Rs)
       
    # Replace special chars
    def replace_spec_chars(self, text):  
-        text = text.replace('ä','\341').replace('ö', '\357').replace('ü', '\365')
+        if type(text) == str:
+            try:
+                text = unicode(text)
+            except UnicodeDecodeError:
+                return text
+
+        # Remove accents from letters
+        nfkd_form = unicodedata.normalize('NFKD', text)
+
+        # Remove accented letters (where not normalised above)
+        only_ascii = nfkd_form.encode('ASCII', 'ignore')
+
+        return only_ascii

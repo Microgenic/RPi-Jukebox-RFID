@@ -7,23 +7,21 @@
 PATHDATA="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 clear
-echo "##################################################### 
-#    ___  __ ______  _  __________ ____   __  _  _  #
-#   / _ \/ // / __ \/ |/ /  _/ __/(  _ \ /  \( \/ ) #
-#  / ___/ _  / /_/ /    // // _/   ) _ ((  O ))  (  #
-# /_/  /_//_/\____/_/|_/___/____/ (____/ \__/(_/\_) #
-#                                                   #
-##################################################### 
-
-Welcome to the backup config script.
-
-This script will backup Phoniebox configuration from
-your Raspberry Pi.
-Only the rfid card and playbackmode config will be backed up.
-The music and folder structure must be backed up itself.
-
-If you are ready, hit ENTER"
-read INPUT
+echo "Backup files"
 
 
-rfid_trigger_play.sh
+# Python scripts
+# /home/pi/RPi-Jukebox-RFID/scripts/
+
+sudo cp /home/pi/RPi-Jukebox-RFID/scripts/gpio-buttons.py $PATHDATA/gpio-buttons.py
+sudo cp /home/pi/RPi-Jukebox-RFID/scripts/i2c_lcd_driver.py $PATHDATA/i2c_lcd_driver.py
+sudo cp /home/pi/RPi-Jukebox-RFID/scripts/rfid_trigger_play.sh $PATHDATA/rfid_trigger_play.sh
+
+# Services
+# /etc/systemd/system/phoniebox-idle-watchdog.service
+sudo cp /etc/systemd/system/phoniebox-i2c-lcd-display.service $PATHDATA/phoniebox-i2c-lcd-display.service
+
+#Start- / Stop-Scripts
+#
+# /lib/systemd/system-shutdown/
+sudo cp /lib/systemd/system-shutdown/shim-shutoff.sh $PATHDATA/shim-shutoff.sh

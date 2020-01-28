@@ -23,6 +23,12 @@ from subprocess import check_call
 # I have not yet had the time to test is, so I placed it in the misc folder.
 # If anybody has ideas or tests or experience regarding this solution, please create pull requests or contact me.
 
+#ledNext = LED(XX)
+#ledPrev = LED(XX)
+#ledPause = LED(XX)
+#ledVolU = LED(XX)
+#ledVolD = LED(XX)
+
 def def_shutdown():
     check_call("./scripts/playout_controls.sh -c=shutdown", shell=True)
 
@@ -39,6 +45,7 @@ def def_next():
     check_call("./scripts/playout_controls.sh -c=playernext", shell=True)
 
 def def_prev():
+    #ledNext.on()
     check_call("./scripts/playout_controls.sh -c=playerprev", shell=True)
 
 def def_halt():
@@ -72,6 +79,7 @@ volD.when_pressed = def_volD
 #When the Volume Down button was held for more than 0.3 seconds every 0.3 seconds he will lower t$
 volD.when_held = def_volD
 next.when_pressed = def_next
+#next.when_released = ledNext.off()
 prev.when_pressed = def_prev
 halt.when_pressed = def_halt
 #reco.when_pressed = def_recordstart
