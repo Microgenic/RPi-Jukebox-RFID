@@ -463,53 +463,84 @@ esac
 # power management of wifi: switch off to avoid disconnecting
 sudo iwconfig wlan0 power off
 
+# Generate locales
+sudo locale-gen $LANG
+
 # Install required packages
+
+wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
+sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/buster.list
+
 sudo apt-get update
-sudo apt-get --yes --force-yes install apt-transport-https samba samba-common-bin python-dev python-pip gcc raspberrypi-kernel-headers lighttpd php7.3-common php7.3-cgi php7.3 php7.3-fpm at mpd mpc mpg123 git ffmpeg python-mutagen python3-gpiozero resolvconf spi-tools python-spidev python3-spidev
+sudo apt-get --yes upgrade
+sudo apt-get install --yes libspotify-dev git
+sudo apt-get --yes --allow-downgrades --allow-remove-essential --allow-change-held-packages install apt-transport-https samba samba-common-bin gcc raspberrypi-kernel-headers lighttpd php7.3-common php7.3-cgi php7.3 php7.3-fpm at mpd mpc mpg123 ffmpeg resolvconf spi-tools
+sudo apt-get --yes install git
+
+# prepare python2 and python3
+sudo apt-get --yes --allow-downgrades --allow-remove-essential --allow-change-held-packages install python-dev python-pip python-mutagen python-gpiozero python-spidev
+sudo apt-get --yes --allow-downgrades --allow-remove-essential --allow-change-held-packages install python3 python3-dev python3-pip python3-mutagen python3-gpiozero python3-spidev
+
+# use python3.7 as default
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 
 # Install required spotify packages
 if [ $SPOTinstall == "YES" ]
 then
-	wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
-	sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/stretch.list
-	sudo apt-get update
-	sudo apt-get --yes --force-yes install mopidy
-	sudo apt-get --yes --force-yes install libspotify12 python-cffi python-ply python-pycparser python-spotify
+	sudo apt-get install --yes mopidy=2.2.2-1
+	sudo python2.7 -m pip install Mopidy==2.2.*
+
+	sudo apt-get --yes --allow-downgrades --allow-remove-essential --allow-change-held-packages install libspotify12 python-cffi python-ply python-pycparser python-spotify
 	sudo rm -rf /usr/lib/python2.7/dist-packages/mopidy_spotify*
 	sudo rm -rf /usr/lib/python2.7/dist-packages/Mopidy_Spotify-*
 	cd
 	sudo rm -rf mopidy-spotify
 	git clone -b fix/web_api_playlists --single-branch https://github.com/princemaxwell/mopidy-spotify.git
 	cd mopidy-spotify
-	sudo python setup.py install
+	sudo python2 setup.py install
+
 	cd
 	# should be removed, if Mopidy-Iris can be installed normally
 	# pylast >= 3.0.0 removed the python2 support
-	sudo pip install pylast==2.4.0
-	sudo pip install Mopidy-Iris
+	 sudo python2.7 -m pip install pylast==2.4.0
+	# not sure tornado still needs to be downgraded now that Mopidy 3 is not installed and tornado seems to be 5.1
+ 	sudo python2.7 -m pip install 'tornado==5.0'
+	sudo python2.7 -m pip install Mopidy-Iris==3.43.0
 fi
 
 # Get github code
 cd /home/pi/
-git clone https://github.com/MiczFlor/RPi-Jukebox-RFID.git
 
-move into the Phoniebox dir
-cd RPi-Jukebox-RFID
+# Must be changed to the correct branch!!!
+# Change to master when merging develop with master!!!
+# this needs to be replaced on develop
+git clone --branch master https://github.com/MiczFlor/RPi-Jukebox-RFID.git
+cd /home/pi/RPi-Jukebox-RFID/misc/sampleconfigs/
+
+# The following lines are just for development.
+#sudo rm phoniebox-rfid-reader.service.stretch-default.sample
+#wget https://raw.githubusercontent.com/MiczFlor/RPi-Jukebox-RFID/develop/misc/sampleconfigs/phoniebox-rfid-reader.service.stretch-default.sample
+#cd /home/pi/RPi-Jukebox-RFID/scripts/
+#sudo rm RegisterDevice.py
+#wget https://raw.githubusercontent.com/MiczFlor/RPi-Jukebox-RFID/develop/scripts/RegisterDevice.py
+
+# Jump into the Phoniebox dir
+cd /home/pi/RPi-Jukebox-RFID
 
 # Install more required packages
-sudo pip install -r requirements.txt
+sudo python3 -m pip install -r requirements.txt
 
 # actually, for the time being most of the requirements are run here.
 # the requirements.txt version seems to throw errors. Help if you can to fix this:
 
-sudo pip install "evdev == 0.7.0"
-sudo pip install --upgrade youtube_dl
-sudo pip install git+git://github.com/lthiery/SPI-Py.git#egg=spi-py
-sudo pip install pyserial
+sudo python3 -m pip install "evdev == 0.7.0"
+sudo python3 -m pip install --upgrade youtube_dl
+sudo python3 -m pip install git+git://github.com/lthiery/SPI-Py.git#egg=spi-py
+sudo python3 -m pip install pyserial
 # spidev is currently installed via apt-get
 #sudo pip install spidev
-sudo pip install RPi.GPIO
-sudo pip install pi-rc522
+sudo python3 -m pip install RPi.GPIO
+sudo python3 -m pip install pi-rc522
 
 # Switch of WiFi power management
 sudo iwconfig wlan0 power off
@@ -780,6 +811,9 @@ mkdir /home/pi/RPi-Jukebox-RFID/playlists
 sudo chown -R pi:www-data /home/pi/RPi-Jukebox-RFID/playlists
 sudo chmod -R 775 /home/pi/RPi-Jukebox-RFID/playlists
 
+sudo chown -R pi:www-data /home/pi/RPi-Jukebox-RFID/playlists
+sudo chmod -R 775 /home/pi/RPi-Jukebox-RFID/playlists
+
 # make sure the shared folder is accessible by the web server
 sudo chown -R pi:www-data /home/pi/RPi-Jukebox-RFID/shared
 sudo chmod -R 775 /home/pi/RPi-Jukebox-RFID/shared
@@ -831,7 +865,7 @@ case "$response" in
         ;;
     *)
         cd /home/pi/RPi-Jukebox-RFID/scripts/
-        python2 RegisterDevice.py
+        python3 RegisterDevice.py
         sudo chown pi:www-data /home/pi/RPi-Jukebox-RFID/scripts/deviceName.txt
         sudo chmod 644 /home/pi/RPi-Jukebox-RFID/scripts/deviceName.txt
         ;;
@@ -841,6 +875,16 @@ echo
 echo "DONE. Let the sounds begin."
 echo "Find more information and documentation on the github account:"
 echo "https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/"
+
+echo "Reboot is needed to activate all settings"
+read -r -p "Would you like to reboot now? [Y/n] " response
+case "$response" in
+    [nN][oO]|[nN])
+        ;;
+    *)
+        sudo shutdown -r now
+        ;;
+esac
 
 #####################################################
 # notes for things to do
