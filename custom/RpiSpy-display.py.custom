@@ -152,7 +152,7 @@ def lcd_string(message,line):
 def GetMPC(command):
     from subprocess import check_output
     process = check_output(command.split())
-    return process
+    return str(process, 'utf-8') # required for python3
 
 def exit_handler():
     global LCD_BACKLIGHT

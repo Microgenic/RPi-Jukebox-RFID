@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# OnOff SHIM exposed by cyperghost for retropie.org.uk
+# This is mandatory for proper SHIM shutdown!
+
+poweroff_pin="4"
+led_pin="17"
+
+if [ "$1" = "poweroff" ] || [ "$1" = "halt" ]; then
+
+    /bin/echo $led_pin > /sys/class/gpio/export
+    /bin/echo out > /sys/class/gpio/gpio$led_pin/direction
+
+        for iteration in 1 2 3; do
+            /bin/echo 0 > /sys/class/gpio/gpio$led_pin/value
+            /bin/sleep 0.2
+            /bin/echo 1 > /sys/class/gpio/gpio$led_pin/value
+            /bin/sleep 0.2
+       done
+
+    /bin/echo $poweroff_pin > /sys/class/gpio/export
+    /bin/echo out > /sys/class/gpio/gpio$poweroff_pin/direction
+    /bin/echo 0 > /sys/class/gpio/gpio$poweroff_pin/value
+fi
