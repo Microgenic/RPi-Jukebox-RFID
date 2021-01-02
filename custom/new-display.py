@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: latin-1 -*-
 
-import i2c-lcd-driver
+import i2c_lcd_driver
 from time import sleep
 from subprocess import check_output
 

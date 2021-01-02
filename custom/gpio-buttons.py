@@ -6,10 +6,6 @@ from subprocess import check_call
 # This script will block any I2S DAC e.g. from Hifiberry, Justboom, ES9023, PCM5102A
 # due to the assignment of GPIO 19 and 21 to a buttons
 
-# 2019-12-12
-# Customized to needs
-# According https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/Hardware-Pinout-Overview#flexible-pin-out
-#
 # 2018-10-31
 # Added the function on holding volume + - buttons to change the volume in 0.3s interval
 #
